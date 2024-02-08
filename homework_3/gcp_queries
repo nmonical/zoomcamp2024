@@ -1,0 +1,30 @@
+CREATE OR REPLACE EXTERNAL TABLE `datacamp2024.ny_taxi.green_taxi_2022`
+OPTIONS (
+  format = 'Parquet',
+  uris = ['gs://mage-zoomcamp-nmonical/nyc_taxi_data_green_2022.parquet']
+);
+
+CREATE OR REPLACE TABLE datacamp2024.ny_taxi.green_taxi_2022_non_partitoned AS
+SELECT * FROM datacamp2024.ny_taxi.green_taxi_2022;
+
+SELECT COUNT(DISTINCT PULocationID) FROM `datacamp2024.ny_taxi.green_taxi_2022_non_partitoned`;
+
+SELECT COUNT(DISTINCT PULocationID) FROM datacamp2024.ny_taxi.green_taxi_2022;
+
+SELECT COUNT(*) FROM datacamp2024.ny_taxi.green_taxi_2022
+WHERE fare_amount = 0;
+
+CREATE OR REPLACE TABLE datacamp2024.ny_taxi.green_taxi_2022_partitoned_clustered
+PARTITION BY DATE(lpep_pickup_datetime) 
+CLUSTER BY PULocationId AS
+SELECT * FROM datacamp2024.ny_taxi.green_taxi_2022;
+
+SELECT COUNT(DISTINCT PULocationID) FROM `datacamp2024.ny_taxi.green_taxi_2022_non_partitoned`
+WHERE EXTRACT(DATE FROM lpep_pickup_datetime) >= '2022-06-01'
+  AND EXTRACT(DATE FROM lpep_pickup_datetime) <= '2022-06-30';
+
+SELECT COUNT(DISTINCT PULocationID) FROM `datacamp2024.ny_taxi.green_taxi_2022_partitoned_clustered`
+WHERE EXTRACT(DATE FROM lpep_pickup_datetime) >= '2022-06-01'
+  AND EXTRACT(DATE FROM lpep_pickup_datetime) <= '2022-06-30';
+
+SELECT COUNT(*) FROM `datacamp2024.ny_taxi.green_taxi_2022_non_partitoned`;
