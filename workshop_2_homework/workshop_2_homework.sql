@@ -51,16 +51,10 @@ SELECT * FROM time_bet_zones
 ORDER BY mid DESC
 LIMIT 5;
 
-SELECT taxi_zone, COUNT(*)
-FROM latest_pickup_time
-WHERE latest_pickup_time BETWEEN latest_pickup_time AND (latest_pickup_time - 17)
-GROUP BY taxi_zone
-ORDER BY COUNT(*)
-LIMIT 5;
 
 WITH last_pickup AS (SELECT max(latest_pickup_time) max FROM latest_pickup_time) 
 SELECT taxi_zone, COUNT(*) FROM pickup_time, last_pickup 
-WHERE pickup BETWEEN max - interval '17 hours' AND max
+WHERE pickup >= max - interval '17 hours' 
 GROUP BY taxi_zone
 ORDER BY COUNT(*) DESC
 LIMIT 5
